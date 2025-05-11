@@ -1,0 +1,50 @@
+{
+  "name": "@profullstack/document-converters",
+  "version": "0.2.0",
+  "description": "Simple document conversion utilities for various formats",
+  "type": "module",
+  "main": "dist/index.js",
+  "module": "dist/index.js",
+  "exports": {
+    ".": "./dist/index.js",
+    "./pdf": "./dist/pdf.js",
+    "./doc": "./dist/doc.js",
+    "./excel": "./dist/excel.js",
+    "./ppt": "./dist/ppt.js",
+    "./epub": "./dist/epub.js",
+    "./markdown": "./dist/markdown.js"
+  },
+  "scripts": {
+    "build": "mkdir -p dist && cp src/*.js dist/",
+    "test": "node test/index.js",
+    "prepublishOnly": "npm run build"
+  },
+  "keywords": [
+    "pdf",
+    "doc",
+    "excel",
+    "powerpoint",
+    "epub",
+    "markdown",
+    "html",
+    "conversion"
+  ],
+  "author": "ProFullStack",
+  "license": "MIT",
+  "dependencies": {
+    "puppeteer": "^22.5.0",
+    "jsdom": "^26.1.0",
+    "marked": "^15.0.8",
+    "docx": "^9.5.0",
+    "xlsx": "^0.18.5",
+    "uuid": "^11.1.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/profullstack/document-converters"
+  },
+  "bugs": {
+    "url": "https://github.com/profullstack/document-converters/issues"
+  },
+  "homepage": "https://github.com/profullstack/document-converters#readme"
+}
