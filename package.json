@@ -1,6 +1,6 @@
 {
   "name": "@profullstack/document-converters",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "description": "Simple document conversion utilities for various formats",
   "type": "module",
   "main": "dist/index.js",
@@ -16,8 +16,11 @@
   },
   "scripts": {
     "build": "mkdir -p dist && cp src/*.js dist/",
-    "test": "node test/index.js",
+    "test": "pnpm install && node --experimental-vm-modules node_modules/jest/bin/jest.js",
     "prepublishOnly": "npm run build"
+  },
+  "devDependencies": {
+    "jest": "^29.7.0"
   },
   "keywords": [
     "pdf",
