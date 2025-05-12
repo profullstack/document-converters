@@ -1,13 +1,33 @@
 /**
  * PDF Converter Module
- * 
+ *
  * A simple API for converting HTML content to PDF documents using Puppeteer
+ * With browser compatibility for ESM imports
  */
 
-import puppeteer from 'puppeteer';
-import os from 'os';
-import fs from 'fs';
-import path from 'path';
+// Conditional imports for Node.js environment only
+let puppeteer;
+let os;
+let fs;
+let path;
+let isNode = false;
+
+// Check if we're in a Node.js environment
+try {
+  isNode = typeof process !== 'undefined' &&
+           process.versions != null &&
+           process.versions.node != null;
+  
+  if (isNode) {
+    // Dynamic imports for Node.js environment
+    puppeteer = (await import('puppeteer')).default;
+    os = (await import('os')).default;
+    fs = (await import('fs')).default;
+    path = (await import('path')).default;
+  }
+} catch (error) {
+  console.warn('Running in browser environment, PDF conversion not available');
+}
 
 /**
  * Get Puppeteer configuration based on the environment
@@ -15,6 +35,11 @@ import path from 'path';
  * @returns {Object} Puppeteer launch options
  */
 const getPuppeteerConfig = () => {
+  // Check if we're in a Node.js environment
+  if (!isNode) {
+    throw new Error('Puppeteer is only available in Node.js environment');
+  }
+
   const config = {
     headless: 'new',
     args: ['--no-sandbox', '--disable-setuid-sandbox']
@@ -63,6 +88,11 @@ export const pdfConverter = {
    * @returns {Promise<Buffer>} - PDF document as a buffer
    */
   fromHtml: async (html, options = {}) => {
+    // Check if we're in a Node.js environment
+    if (!isNode || !puppeteer) {
+      throw new Error('PDF conversion is only available in Node.js environment');
+    }
+
     // Default options
     const defaultOptions = {
       format: 'A4',
@@ -108,6 +138,11 @@ export const pdfConverter = {
    * @returns {Promise<Buffer>} - PDF document as a buffer
    */
   fromUrl: async (url, options = {}) => {
+    // Check if we're in a Node.js environment
+    if (!isNode || !puppeteer) {
+      throw new Error('PDF conversion is only available in Node.js environment');
+    }
+
     // Default options
     const defaultOptions = {
       format: 'A4',
@@ -153,6 +188,11 @@ export const pdfConverter = {
    * @returns {Promise<Buffer>} - PDF document as a buffer
    */
   fromMultipleHtml: async (htmlPages, options = {}) => {
+    // Check if we're in a Node.js environment
+    if (!isNode || !puppeteer) {
+      throw new Error('PDF conversion is only available in Node.js environment');
+    }
+
     if (!Array.isArray(htmlPages) || htmlPages.length === 0) {
       throw new Error('htmlPages must be a non-empty array of HTML strings');
     }
