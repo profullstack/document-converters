@@ -1,6 +1,6 @@
 {
   "name": "@profullstack/document-converters",
-  "version": "0.2.9",
+  "version": "0.2.10",
   "description": "Simple document conversion utilities for various formats",
   "type": "module",
   "main": "dist/index.js",
