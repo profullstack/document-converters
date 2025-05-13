@@ -16,12 +16,15 @@
   },
   "scripts": {
     "build": "mkdir -p dist && cp src/*.js dist/",
-    "test": "pnpm install && mocha --bail test/index.js",
-    "prepublishOnly": "npm run build"
+    "test": "vitest run --bail 1",
+    "test:watch": "vitest",
+    "test:coverage": "vitest run --coverage",
+    "prepublishOnly": "npm run build",
+    "prepare": "husky"
   },
   "devDependencies": {
-    "chai": "^4.3.7",
-    "mocha": "^10.2.0"
+    "husky": "^9.0.11",
+    "vitest": "^1.3.0"
   },
   "keywords": [
     "pdf",
