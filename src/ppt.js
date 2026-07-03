@@ -12,6 +12,8 @@ import { exec } from 'child_process';
 import { v4 as uuidv4 } from 'uuid';
 import os from 'os';
 
+import { runPandoc } from './pandoc.js';
+
 const execPromise = promisify(exec);
 
 /**
@@ -47,16 +49,8 @@ const convertWithPandoc = async (html, options = {}) => {
     // Write HTML to temporary file
     await fs.promises.writeFile(inputPath, html, 'utf8');
     
-    // Build pandoc command with options
-    let command = `pandoc -f html -t pptx "${inputPath}" -o "${outputPath}"`;
-    
-    // Add any additional pandoc options
-    if (options.pandocOptions) {
-      command += ` ${options.pandocOptions}`;
-    }
-    
-    // Execute pandoc command
-    await execPromise(command);
+    // Run pandoc via execFile (no shell) to avoid command injection via options.
+    await runPandoc('html', 'pptx', inputPath, outputPath, options);
     
     // Read the generated PPTX file
     const pptBuffer = await fs.promises.readFile(outputPath);
@@ -219,16 +213,8 @@ export const pptConverter = {
         // Write markdown to temporary file
         await fs.promises.writeFile(inputPath, markdown, 'utf8');
         
-        // Build pandoc command with options
-        let command = `pandoc -f markdown -t pptx "${inputPath}" -o "${outputPath}"`;
-        
-        // Add any additional pandoc options
-        if (options.pandocOptions) {
-          command += ` ${options.pandocOptions}`;
-        }
-        
-        // Execute pandoc command
-        await execPromise(command);
+        // Run pandoc via execFile (no shell) to avoid command injection via options.
+        await runPandoc('markdown', 'pptx', inputPath, outputPath, options);
         
         // Read the generated PPTX file
         return await fs.promises.readFile(outputPath);

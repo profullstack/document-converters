@@ -14,6 +14,8 @@ import os from 'os';
 import { Document, Paragraph, TextRun, Packer } from 'docx';
 import { JSDOM } from 'jsdom';
 
+import { runPandoc } from './pandoc.js';
+
 const execPromise = promisify(exec);
 
 /**
@@ -49,16 +51,8 @@ const convertWithPandoc = async (html, options = {}) => {
     // Write HTML to temporary file
     await fs.promises.writeFile(inputPath, html, 'utf8');
     
-    // Build pandoc command with options
-    let command = `pandoc -f html -t docx "${inputPath}" -o "${outputPath}"`;
-    
-    // Add any additional pandoc options
-    if (options.pandocOptions) {
-      command += ` ${options.pandocOptions}`;
-    }
-    
-    // Execute pandoc command
-    await execPromise(command);
+    // Run pandoc via execFile (no shell) to avoid command injection via options.
+    await runPandoc('html', 'docx', inputPath, outputPath, options);
     
     // Read the generated DOCX file
     const docBuffer = await fs.promises.readFile(outputPath);
@@ -254,16 +248,8 @@ export const docConverter = {
           // Write markdown to temporary file
           await fs.promises.writeFile(inputPath, markdown, 'utf8');
           
-          // Build pandoc command with options
-          let command = `pandoc -f markdown -t docx "${inputPath}" -o "${outputPath}"`;
-          
-          // Add any additional pandoc options
-          if (options.pandocOptions) {
-            command += ` ${options.pandocOptions}`;
-          }
-          
-          // Execute pandoc command
-          await execPromise(command);
+          // Run pandoc via execFile (no shell) to avoid command injection via options.
+          await runPandoc('markdown', 'docx', inputPath, outputPath, options);
           
           // Read the generated DOCX file
           return await fs.promises.readFile(outputPath);
