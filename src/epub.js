@@ -11,6 +11,7 @@ import { promisify } from 'util';
 import { exec } from 'child_process';
 import { v4 as uuidv4 } from 'uuid';
 import os from 'os';
+import { runPandoc } from './pandoc.js';
 
 const execPromise = promisify(exec);
 
@@ -44,40 +45,12 @@ const convertWithPandoc = async (html, options = {}) => {
   const outputPath = path.join(tempDir, `${outputId}.epub`);
   
   try {
-    // Extract metadata from options
-    const { title, author, language, cover } = options;
-    
     // Write HTML to temporary file
     await fs.promises.writeFile(inputPath, html, 'utf8');
-    
-    // Build pandoc command with options
-    let command = `pandoc -f html -t epub "${inputPath}" -o "${outputPath}"`;
-    
-    // Add metadata if provided
-    if (title) {
-      command += ` --metadata title="${title}"`;
-    }
-    
-    if (author) {
-      command += ` --metadata author="${author}"`;
-    }
-    
-    if (language) {
-      command += ` --metadata language="${language}"`;
-    }
-    
-    // Add cover image if provided
-    if (cover) {
-      command += ` --epub-cover-image="${cover}"`;
-    }
-    
-    // Add any additional pandoc options
-    if (options.pandocOptions) {
-      command += ` ${options.pandocOptions}`;
-    }
-    
-    // Execute pandoc command
-    await execPromise(command);
+
+    // Run pandoc via execFile (no shell) to avoid command injection through
+    // metadata (title/author/language are extracted from the input HTML).
+    await runPandoc('html', 'epub', inputPath, outputPath, options);
     
     // Read the generated EPUB file
     const epubBuffer = await fs.promises.readFile(outputPath);
@@ -209,40 +182,11 @@ export const epubConverter = {
       const outputPath = path.join(tempDir, `${outputId}.epub`);
       
       try {
-        // Extract metadata from options
-        const { title, author, language, cover } = options;
-        
         // Write markdown to temporary file
         await fs.promises.writeFile(inputPath, markdown, 'utf8');
-        
-        // Build pandoc command with options
-        let command = `pandoc -f markdown -t epub "${inputPath}" -o "${outputPath}"`;
-        
-        // Add metadata if provided
-        if (title) {
-          command += ` --metadata title="${title}"`;
-        }
-        
-        if (author) {
-          command += ` --metadata author="${author}"`;
-        }
-        
-        if (language) {
-          command += ` --metadata language="${language}"`;
-        }
-        
-        // Add cover image if provided
-        if (cover) {
-          command += ` --epub-cover-image="${cover}"`;
-        }
-        
-        // Add any additional pandoc options
-        if (options.pandocOptions) {
-          command += ` ${options.pandocOptions}`;
-        }
-        
-        // Execute pandoc command
-        await execPromise(command);
+
+        // Run pandoc via execFile (no shell) to avoid command injection.
+        await runPandoc('markdown', 'epub', inputPath, outputPath, options);
         
         // Read the generated EPUB file
         return await fs.promises.readFile(outputPath);
